@@ -77,6 +77,24 @@ let
             Consider provide a single root CA instead.
           '';
         };
+
+        chrome = mkOption {
+          type = types.path;
+          default = [ ];
+          description = ''
+            Specify the content for "$HOME/.zen/<Your Profile>/chrome".
+            It will be evaluated as `home.file.".zen/<Your Profile>/chrome".source`
+            and set recursively to avoid write permission issues.
+          '';
+          example = literalExpression ''
+            pkgs.fetchFromGitHub {
+              owner = "justadumbprsn";
+              repo = "zen-nebula";
+              rev = "main";
+              sha256 = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
+            };
+          '';
+        };
       };
     };
 
@@ -90,6 +108,14 @@ let
           )}
         ''
       );
+    }
+  ) cfg.profiles;
+
+  userChromeDir = mapAttrs' (
+    name: value:
+    nameValuePair "${zenConfDir}/${name}/chrome" {
+      source = value.chrome;
+      recursive = true;
     }
   ) cfg.profiles;
 
@@ -189,7 +215,7 @@ in
       package
     ];
 
-    home.file = userJsFiles // profilesIni;
+    home.file = userJsFiles // profilesIni // userChromeDir;
 
     systemd.user.services = {
       zen-browser-ensure-ca = {
