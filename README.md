@@ -6,33 +6,69 @@ Just add it to your NixOS `flake.nix` or home-manager:
 
 ```nix
 inputs = {
-  zen-browser.url = "github:MarceColl/zen-browser-flake";
+  zen-browser.url = "github:DACHXY/zen-browser-flake";
+
+  # Other input
   ...
 }
 ```
 
+## Home Manager Option Example
+
+```nix
+let
+  # user chrome plugin
+  zenNebula = pkgs.fetchFromGitHub {
+    owner = "justadumbprsn";
+    repo = "zen-nebula";
+    rev = "main";
+    sha256 = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
+  };
+in
+{
+  programs.zen-browser = {
+    enable = true;
+    profiles = {
+      "Default Profile" = {
+        default = true;
+        name = "Default";
+        settings = {
+          "zen.view.compact.should-enable-at-startup" = true;
+          "zen.widget.linux.transparency" = true;
+          "zen.view.compact.show-sidebar-and-toolbar-on-hover" = false;
+
+          "app.update.auto" = false;
+          "app.normandy.first_run" = false;
+          "browser.aboutConfig.showWarning" = false;
+          "browser.shell.checkDefaultBrowser" = false;
+          "browser.shell.didSkipDefaultBrowserCheckOnFirstRun" = true;
+          "browser.tabs.allow_transparent_browser" = true;
+          "browser.urlbar.placeholderName" = "Google";
+          "browser.urlbar.placeholderName.private" = "DuckDuckGo";
+          "middlemouse.paste" = false;
+          "toolkit.legacyUserProfileCustomizations.stylesheets" = true;
+          "font.name.monospace.x-western" = "CaskaydiaCove Nerd Font Mono";
+        };
+        ensureCACertifications = [
+          ../path/to/your/ca.crt
+        ];
+        chrome = zenNebula;
+      };
+    };
+  };
+}
+
+```
+
 ## Packages
 
-This flake exposes two packages, corresponding to the `specific` and `generic` zen versions.
-The generic version maximizes compatibility with old CPUs and kernels by compiling it with some
-lower common denominator CFLAGS, the `specific` one targets newer CPUs and kernels but it may not
-work in your case.
+> NOTE: If `programs.zen-browser.enable` is set to `true`, the following is not required.
 
-The `default` package is the `specific` one for backwards compatibility with older versions of the flake.
-
-Then in the `configuration.nix` in the `environment.systemPackages` add one of:
+Then in the `configuration.nix` in the `environment.systemPackages`
+or `home.packages` add:
 
 ```nix
 inputs.zen-browser.packages."${system}".default
-inputs.zen-browser.packages."${system}".specific
-inputs.zen-browser.packages."${system}".generic
-```
-
-Depending on which version you want
-
-```shell
-$ sudo nixos-rebuild switch
-$ zen
 ```
 
 ## 1Password
