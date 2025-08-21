@@ -104,10 +104,11 @@ let
       source = (
         pkgs.writeText "zen-browser-${name}-user.js" ''
           ${concatStringsSep "\n" (
-            mapAttrsToList (sname: svalue: "user_pref(\"${sname}\", ${toJSON svalue})") value.settings
+            mapAttrsToList (sname: svalue: "user_pref(\"${sname}\", ${toJSON svalue});") value.settings
           )}
         ''
       );
+      executable = true;
     }
   ) cfg.profiles;
 
