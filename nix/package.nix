@@ -46,7 +46,7 @@ let
   inherit (lib.strings) splitString concatStringsSep;
   inherit (lib.lists) reverseList;
   finalSystem = concatStringsSep "-" (reverseList (splitString "-" system));
-  version = "1.14.11b";
+  version = "1.15.2b";
 
   runtimeLibs = [
     libGL
@@ -104,7 +104,7 @@ stdenv.mkDerivation {
 
   src = fetchTarball {
     url = "https://github.com/zen-browser/desktop/releases/download/${version}/zen.${finalSystem}.tar.xz";
-    sha256 = "sha256:06rx4hb6d1gy1kja73cmkywyvp5i0mb4szv1drih9xxla4ik8lsh";
+    sha256 = "sha256:1hyx440cxm73g4ri649fw22pj552zvfmnvakkzq9xc3myr59cqqk";
   };
 
   desktopSrc = ../.;
