@@ -46,7 +46,7 @@ let
   inherit (lib.strings) splitString concatStringsSep;
   inherit (lib.lists) reverseList;
   finalSystem = concatStringsSep "-" (reverseList (splitString "-" system));
-  version = "1.16.3b";
+  version = "1.17.8b";
 
   runtimeLibs = [
     libGL
