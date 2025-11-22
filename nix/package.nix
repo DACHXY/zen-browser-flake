@@ -104,7 +104,7 @@ stdenv.mkDerivation {
 
   src = fetchTarball {
     url = "https://github.com/zen-browser/desktop/releases/download/${version}/zen.${finalSystem}.tar.xz";
-    sha256 = "sha256:1hyx440cxm73g4ri649fw22pj552zvfmnvakkzq9xc3myr59cqqk";
+    sha256 = "sha256:10z44779wwn3zhw8j791i0jaahcdihsqcc76cg0wvk7pahfxm856";
   };
 
   desktopSrc = ../.;
