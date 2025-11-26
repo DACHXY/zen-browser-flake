@@ -205,6 +205,11 @@ in
 {
   options.programs.zen-browser = {
     enable = mkEnableOption "enable zen browser";
+    package = mkOption {
+      default = package;
+      type = types.package;
+      description = "Package to use";
+    };
     profiles = mkOption {
       type = with types; attrsOf (submodule profileSetting);
       description = "profile settings";
@@ -213,7 +218,7 @@ in
 
   config = mkIf cfg.enable {
     home.packages = [
-      package
+      cfg.package
     ];
 
     home.file = userJsFiles // profilesIni // userChromeDir;
