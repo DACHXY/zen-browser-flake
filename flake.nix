@@ -21,6 +21,12 @@
         update = pkgs.writeShellScriptBin "fetch-source" ''
           PATH="$PATH:${pkgs.jq}/bin:${pkgs.curl}/bin"
           VERSION="$(curl -s https://api.github.com/repos/zen-browser/desktop/releases/latest | jq -r .tag_name)"
+
+          if [ -z "$VERSION" ] || [ "$VERSION" = "null" ]; then
+            echo "Failed to fetch latest version."
+            exit 1
+          fi
+
           URL="https://github.com/zen-browser/desktop/releases/download/$VERSION/zen.linux-x86_64.tar.xz"
           HASH="$(nix-prefetch-url --unpack $URL)"
 
