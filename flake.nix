@@ -19,7 +19,7 @@
       packages."${system}" = rec {
         zen-browser = pkgs.callPackage ./nix/package.nix { inherit (source) src version; };
         update = pkgs.writeShellScriptBin "fetch-source" ''
-          PATH="$PATH:${pkgs.jq}/bin:${pkgs.curl}/bin"
+          PATH="$PATH:${pkgs.jq}/bin:${pkgs.curl}/bin:${pkgs.busybox}/bin"
           VERSION="$(curl -s https://api.github.com/repos/zen-browser/desktop/releases/latest | jq -r .tag_name)"
 
           if [ -z "$VERSION" ] || [ "$VERSION" = "null" ]; then
@@ -28,6 +28,14 @@
           fi
 
           echo "Latest version: $VERSION"
+
+          # Version Check
+          LAST_VERSION=$(awk -F'"' '/version =/ {print $2}' ./source.nix)
+
+          if [ "$LAST_VERSION" = "$VERSION" ]; then
+            echo "Already latest version"
+            exit 0
+          fi
 
           URL="https://github.com/zen-browser/desktop/releases/download/$VERSION/zen.linux-x86_64.tar.xz"
 
