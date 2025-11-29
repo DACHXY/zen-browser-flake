@@ -54,14 +54,12 @@ jobs:
           if ! git diff --staged --quiet; then
           git commit -m "action: auto update source"
             echo "Changes committed"
-            git push --set-upstream origin action/auto-update --force
           else
             echo "No changes to commit"
             exit 0
           fi
 
       - name: Create Pull Request
-        if: success() && github.ref != ''
         uses: peter-evans/create-pull-request@v7
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
