@@ -12,10 +12,27 @@
       pkgs = import nixpkgs {
         inherit system;
       };
+
+      source = import ./source.nix;
     in
     {
       packages."${system}" = rec {
-        zen-browser = pkgs.callPackage ./nix/package.nix { inherit system; };
+        zen-browser = pkgs.callPackage ./nix/package.nix { inherit (source) src version; };
+        update = pkgs.writeShellScriptBin "fetch-source" ''
+          VERSION="$(curl -s https://api.github.com/repos/zen-browser/desktop/releases/latest | jq -r .tag_name)"
+          URL="https://github.com/zen-browser/desktop/releases/download/$VERSION/zen.linux-x86_64.tar.xz"
+          HASH="$(nix-prefetch-url --unpack $URL)"
+
+          cat <<EOF > ./source.nix
+          {
+            version = "$VERSION";
+            src = fetchTarball {
+              url = "$URL";
+              sha256 = "sha256:$HASH";
+            };
+          }
+          EOF
+        '';
         default = zen-browser;
       };
       homeManagerModules."${system}" = rec {

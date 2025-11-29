@@ -1,4 +1,6 @@
 {
+  src,
+  version,
   stdenv,
   libGL,
   libGLU,
@@ -38,15 +40,10 @@
   wrapGAppsHook,
   xorg,
   lib,
-  system,
   ...
 }:
 let
   inherit lib;
-  inherit (lib.strings) splitString concatStringsSep;
-  inherit (lib.lists) reverseList;
-  finalSystem = concatStringsSep "-" (reverseList (splitString "-" system));
-  version = "1.17.8b";
 
   runtimeLibs = [
     libGL
@@ -99,13 +96,8 @@ let
   ]);
 in
 stdenv.mkDerivation {
-  inherit version;
+  inherit version src;
   pname = "zen-browser";
-
-  src = fetchTarball {
-    url = "https://github.com/zen-browser/desktop/releases/download/${version}/zen.${finalSystem}.tar.xz";
-    sha256 = "sha256:10z44779wwn3zhw8j791i0jaahcdihsqcc76cg0wvk7pahfxm856";
-  };
 
   desktopSrc = ../.;
 
