@@ -1,0 +1,72 @@
+name: Auto update & PR
+
+on:
+  push:
+    branches:
+      - "master"
+  schedule:
+    - cron: "0 19 * * *"
+  workflow_dispatch:
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - uses: cachix/install-nix-action@v31
+        with:
+          nix_path: nixpkgs=channel:nixpkgs-unstable
+
+      - name: Config git
+        run: |
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
+
+      - name: Checkout Update Branch
+        run: |
+          if git show-ref --verify --quiet refs/heads/action/auto-update; then
+            git branch -D action/auto-update
+          fi
+          git checkout -b action/auto-update
+
+      - name: Update source
+        run: |
+          echo "Fetching update..."
+          nix run .#update
+          git add source.nix
+
+      - name: Test Build
+        run: |
+          nix build
+
+      - name: Test Flake
+        run: |
+          nix flake check
+
+      - name: Commit Changes
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "Commit Changes"
+          if ! git diff --staged --quiet; then
+          git commit -m "action: auto update source"
+            echo "Changes committed"
+            git push --set-upstream origin action/auto-update --force
+          else
+            echo "No changes to commit"
+            exit 0
+          fi
+
+      - name: Create Pull Request
+        if: success() && github.ref != ''
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "Auto update source.nix"
+          base: master
+          branch: action/auto-update
+          title: "Auto Update source.nix"
+          body: "This PR was automatically created by GitHub Actions after running nix update."
