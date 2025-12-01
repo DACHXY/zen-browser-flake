@@ -2,7 +2,7 @@
   description = "Zen Browser";
 
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs?ref=nixos-unstable";
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
   };
 
   outputs =
@@ -59,7 +59,7 @@
         '';
         default = zen-browser;
       };
-      homeManagerModules."${system}" = rec {
+      homeManagerModules = rec {
         zen-browser = import ./nix/hm-module.nix self;
         default = zen-browser;
       };

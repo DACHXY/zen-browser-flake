@@ -16,6 +16,7 @@ let
     mapAttrs'
     mapAttrsToList
     nameValuePair
+    filterAttrs
     ;
 
   inherit (builtins) toJSON toString;
@@ -79,8 +80,8 @@ let
         };
 
         chrome = mkOption {
-          type = types.path;
-          default = [ ];
+          type = with types; nullOr path;
+          default = null;
           description = ''
             Specify the content for "$HOME/.zen/<Your Profile>/chrome".
             It will be evaluated as `home.file.".zen/<Your Profile>/chrome".source`
@@ -118,7 +119,7 @@ let
       source = value.chrome;
       recursive = true;
     }
-  ) cfg.profiles;
+  ) (filterAttrs (n: v: v.chrome != null) cfg.profiles);
 
   profilesIni = {
     "${zenConfDir}/profiles.ini".source = pkgs.writeText "zen-browser-profiles.ini" ''
@@ -223,13 +224,7 @@ in
 
     home.file = userJsFiles // profilesIni // userChromeDir;
 
-    systemd.user.services = {
-      zen-browser-ensure-ca = {
-        Service = {
-          ExecStart = "${caScript}";
-        };
-      };
-    };
+    systemd.user.services.zen-browser-ensure-ca.Service.ExecStart = "${caScript}";
 
     home.activation.zen-browser-ensure-ca = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
       ${pkgs.systemd}/bin/systemctl --user restart zen-browser-ensure-ca.service

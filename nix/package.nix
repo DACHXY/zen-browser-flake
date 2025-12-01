@@ -37,7 +37,7 @@
   pipewire,
   makeWrapper,
   copyDesktopItems,
-  wrapGAppsHook,
+  wrapGAppsHook3,
   xorg,
   lib,
   ...
@@ -109,7 +109,7 @@ stdenv.mkDerivation {
   nativeBuildInputs = [
     makeWrapper
     copyDesktopItems
-    wrapGAppsHook
+    wrapGAppsHook3
   ];
 
   installPhase = ''
